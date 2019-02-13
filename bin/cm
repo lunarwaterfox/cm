@@ -68,10 +68,12 @@ function create() {
 }
 
 function compile() {
-    echo $1
+    cmake --build .
 }
 
-
+function test() {
+    ctest
+}
 
 COMMAND=$1
 
@@ -80,25 +82,9 @@ case $1 in
         shift
         create $@;;
     "compile")
-        shift
-        compile $@;;
+        compile;;
+    "test")
+        test;;
     *)
         showCMHelp;;
 esac
-
-
-
-
-
-
-
-
-
-
-
-# TEMPLATE=$CMHOME/e
-
-
-#cd ../$BUILD
-#cmake ../$PROJ
-#cmake --build .
