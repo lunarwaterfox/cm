@@ -1,0 +1,1 @@
+add_library(core ${PROJECT_NAME}.cpp)

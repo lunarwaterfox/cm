@@ -1,0 +1,104 @@
+#!/bin/sh
+
+CMHOME=/usr/local/
+
+function showCMHelp() {
+    echo "usage:"
+    echo ""
+    echo "  cm <command> [<args>]"
+    echo ""
+    echo "Command"
+    echo "  create    Create a project to a new directory"
+    echo "  compile   Compile current project"
+    echo ""
+}
+
+function showCreateHelp() {
+    echo "usage:"
+    echo ""
+    echo "  cm create <path-for-create-project>"
+    echo ""
+}
+
+function create() {
+    if [ -z $1 ]; then
+        showCreateHelp
+        return
+    fi
+
+    PROJECT_NAME=$1
+    CLASS_NAME=$(tr '[:lower:]' '[:upper:]' <<< ${PROJECT_NAME:0:1})${PROJECT_NAME:1}
+    CURRENT_PATH=$(pwd)
+    TEMPLATE=$CMHOME/etc/cm
+
+    read -p "Please input project path ($CURRENT_PATH/$PROJECT_NAME): " PROJECT_PATH
+    if [ -z $PROJECT_PATH ]; then
+        PROJECT_PATH=$CURRENT_PATH/$PROJECT_NAME
+    fi
+    
+    if [ -d $PROJECT_PATH ]; then
+        echo "$PROJECT_PATH has alread exist."
+        return
+    fi
+
+    PROJECT_DIR=${PROJECT_PATH%/*}
+
+    read -p "Please input build path ($PROJECT_DIR/build): " BUILD_PATH
+    if [ -z $BUILD_PATH ]; then
+        BUILD_PATH=$PROJECT_DIR/build
+    fi
+    
+    if [ -d $BUILD_PATH ]; then
+        echo "$BUILD_PATH has alread exist."
+        return
+    fi
+
+    mkdir $PROJECT_PATH
+    mkdir $BUILD_PATH
+    cp -r $TEMPLATE/* $PROJECT_PATH
+
+    find $PROJECT_PATH -name 'example.*' | sed "p;s/example/$PROJECT_NAME/" | xargs -n2 mv
+    find $PROJECT_PATH -type f -exec sed -i .bak "s/\${PROJECT_NAME}/${PROJECT_NAME}/g;s/\${CLASS_NAME}/${CLASS_NAME}/g" {} \; > /dev/null 2>&1
+    find $PROJECT_PATH -name '*.bak' -delete
+
+    
+    cd $BUILD_PATH
+    cmake $PROJECT_PATH
+    cmake --build .
+}
+
+function compile() {
+    echo $1
+}
+
+
+
+COMMAND=$1
+
+case $1 in
+    "create")
+        shift
+        create $@;;
+    "compile")
+        shift
+        compile $@;;
+    *)
+        showCMHelp;;
+esac
+
+
+
+
+
+
+
+
+
+
+
+# TEMPLATE=$CMHOME/e
+
+
+#cd ../$BUILD
+#cmake ../$PROJ
+#cmake --build .
