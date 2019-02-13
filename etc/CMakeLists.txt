@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.11)
 
 project(task)
 set (CMAKE_CXX_STANDARD 11)
@@ -9,7 +9,8 @@ enable_testing()
 # Download and unpack googletest at configure time
 #------------------------------------------------------------------------------
 
-add_subdirectory(cmake)
+include(cmake/utils.cmake)
+import_gtest()
 
 #------------------------------------------------------------------------------
 # Setup include file
